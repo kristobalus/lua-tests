@@ -1,11 +1,12 @@
 import Redis from "ioredis"
 import fs = require("fs")
+const Table = require('cli-table3');
 
 interface CustomLua extends Redis {
     leaderboard_friends(
         lbKey: string,
         usersIds?: string[],
-    ): Promise<[[string, number, string[]][], number]>
+    ): Promise<[[string, number, string[]][], number, number]>
 }
 
 interface User {
@@ -26,10 +27,22 @@ async function main() {
     const organizationId = "6911691355886452736"
     const lbKey = `lb:${organizationId}:${eventId}`
     const users = JSON.parse(fs.readFileSync("test-users.json").toString("utf-8")) as User[]
-    const userIds = users.slice(0, 100).map(user => user.Id)
-    console.log(userIds.length)
-    const result = await redis.leaderboard_friends(lbKey, userIds)
-    console.log(`result`, result)
+
+    const table = new Table({
+        chars: { 'top': '' , 'top-mid': '' , 'top-left': '' , 'top-right': ''
+            , 'bottom': '' , 'bottom-mid': '' , 'bottom-left': '' , 'bottom-right': ''
+            , 'left': '' , 'left-mid': '' , 'mid': '' , 'mid-mid': ''
+            , 'right': '' , 'right-mid': '' , 'middle': ' ' },
+        style: { 'padding-left': 0, 'padding-right': 0 },
+        head: ['page size', 'lock microsecs', 'max rps']
+    });
+    for (let total = 20; total <= 200; total = total + 20) {
+        const userIds = users.slice(0, total).map(user => user.Id)
+        const [, , elapsedTime] = await redis.leaderboard_friends(lbKey, userIds)
+        table.push([total, elapsedTime, Math.floor(1_000_000 / elapsedTime)])
+    }
+    console.log("leaderboard.list as friend list lock time testing")
+    console.log(table.toString());
     process.exit()
 }
 
