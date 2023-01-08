@@ -36,7 +36,7 @@ async function main() {
         style: { 'padding-left': 0, 'padding-right': 0 },
         head: ['page size', 'lock microsecs', 'max rps']
     });
-    for (let total = 20; total <= 200; total = total + 20) {
+    for (let total = 1; total <= 200; total = total + 20) {
         const userIds = users.slice(0, total).map(user => user.Id)
         const [, , elapsedTime] = await redis.leaderboard_friends(lbKey, userIds)
         table.push([total, elapsedTime, Math.floor(1_000_000 / elapsedTime)])
