@@ -17,6 +17,7 @@ interface User {
 }
 
 const redis = new Redis({ keyPrefix: `{polls}` }) as CustomLua
+// @ts-ignore
 redis.defineCommand("leaderboard_friends", {
     numberOfKeys: 1,
     lua: fs.readFileSync(`${__dirname}/lua/leaderboard_friends.lua`).toString("utf-8"),

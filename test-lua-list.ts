@@ -1,5 +1,5 @@
 import Redis from "ioredis"
-import fs = require("fs")
+import fs = require('fs');
 const Table = require('cli-table3');
 
 interface CustomLua extends Redis {
@@ -11,6 +11,7 @@ interface CustomLua extends Redis {
 }
 
 const redis = new Redis({ keyPrefix: `{polls}` }) as CustomLua
+// @ts-ignore
 redis.defineCommand("leaderboard_list", {
     numberOfKeys: 1,
     lua: fs.readFileSync(`${__dirname}/lua/leaderboard_list.lua`).toString("utf-8"),

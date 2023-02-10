@@ -1,12 +1,13 @@
 
-import Redis from "ioredis"
+import IORedis from "ioredis"
 import fs = require("fs")
 
-interface CustomLua extends Redis {
+interface CustomLua extends IORedis.Redis {
     timeseries(): Promise<any>
 }
 
-const redis = new Redis({ keyPrefix: "{polls}" }) as CustomLua
+const redis = new IORedis({ keyPrefix: "{polls}" }) as CustomLua
+// @ts-ignore
 redis.defineCommand("timeseries", {
     numberOfKeys: 0,
     lua: fs.readFileSync(`${__dirname}/lua/timeseries.lua`).toString("utf-8"),
